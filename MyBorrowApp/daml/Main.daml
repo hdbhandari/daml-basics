@@ -1,0 +1,63 @@
+module Main where
+
+-- with the below statement we will be able to test the script inside the IDE only
+-- We can click on 'Script Results' on top of our tests, which will open Script:setup to view the results
+-- If we wants to see the results in daml navigator, we can disable the script section and comment out the code as well
+import Daml.Script
+
+type ItemCustodyId = ContractId ItemCustody
+
+-- tracks chain of custody of my property
+template ItemCustody
+  with
+    owner : Party
+    custodian : Party
+    neighbor: Party
+    itemName : Text
+    meterCount : Int -- shutter clicks
+  where
+    signatory owner
+    observer neighbor
+    
+    controller owner can
+      ReleaseItemTo : ItemCustodyId
+        with
+          friend : Party
+          currentMeterCount : Int
+        do
+          create this with
+            custodian = friend
+            meterCount = currentMeterCount
+
+    controller custodian can
+      ReturnItemTo : ItemCustodyId
+        with
+          rightfulOwner : Party
+          currentMeterCount : Int
+        do
+          create this with
+            custodian = rightfulOwner
+            meterCount = currentMeterCount
+
+-- tests
+-- Commented just for now to use the Daml navigator
+
+setup : Script ItemCustodyId
+setup = script do
+  jerry <- allocateParty "Jerry"
+  elaine <- allocateParty "Elaine"
+  kramer <- allocateParty "Kramer"
+
+  brandNewCamera <- submit jerry do
+    createCmd ItemCustody with
+      owner = jerry
+      custodian = jerry
+      neighbor = kramer
+      itemName = "Really Expensive Camera"
+      meterCount = 350
+
+  elaineHasCamera <- submit jerry do
+    exerciseCmd brandNewCamera ReleaseItemTo with friend = elaine, currentMeterCount = 347
+
+  submit elaine do
+    exerciseCmd elaineHasCamera ReturnItemTo with rightfulOwner = jerry, currentMeterCount = 10000

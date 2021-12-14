@@ -1,0 +1,16 @@
+-- Token module from Writing Daml Docs
+module Token where
+
+import Daml.Script
+
+template Token
+  with
+    owner: Party
+  where
+    signatory owner
+
+token_test : Script (ContractId Token)
+token_test = do
+  alice <- allocateParty "Alice"
+  submit alice do
+      createCmd Token with owner = alice

@@ -1,0 +1,17 @@
+sdk-version: 1.17.0
+name: MyBorrowApp
+# Commented it to use Navigator
+# Uncomment it to use inline testing script
+init-script: Main:setup
+source: daml
+parties:
+  - Jerry
+  - Elaine
+  - Kramer
+version: 0.0.1
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script
+sandbox-options:
+  - --wall-clock-time
