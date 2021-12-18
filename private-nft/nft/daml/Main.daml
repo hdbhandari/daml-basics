@@ -21,7 +21,6 @@ template Asset
            owner = newOwner
 
 setup : Script AssetId
-
 setup = script do
   alice <- allocatePartyWithHint "Alice" (PartyIdHint "Alice")
   bob <- allocatePartyWithHint "Bob" (PartyIdHint "Bob")
@@ -37,4 +36,3 @@ setup = script do
 
   submit bob do
     exerciseCmd bobTV Give with newOwner = alice
-

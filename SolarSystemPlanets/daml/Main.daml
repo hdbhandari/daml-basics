@@ -1,0 +1,101 @@
+module Main where
+
+import Daml.Script
+import DA.List
+
+type PlanetSystemId = ContractId PlanetSystem
+
+template PlanetSystem
+  with
+    astronomer : Party
+    planets : [Text]
+  where
+    signatory astronomer
+    controller astronomer can
+      -- Add planet to the List
+      AddPlanet: PlanetSystemId
+        with
+          planetToAdd : Text
+        do
+          -- First check if element is already in the list or not
+          -- assertMsg "Already Exists!" (planetToAdd `notElem` planets)
+          create this with
+            planets = dedup (planetToAdd :: planets)
+            {- 
+              1.
+              Above statement will add new planet to the start of the list
+              To the start of the list because lists in haskell are managed by LikedList
+              and adding an element at the start of the list is more efficient in case of linked lists
+              Why Haskel? Because Daml templates are based on Haskell Programming language 
+
+              2.
+              If we have a requirement to add element at the end of the list, then here is the way:
+              planets = planets ++ [planetToAdd]
+              Note: It will also hit the performance
+
+              3.
+              sort: will sort the list in ascending order
+              reverse: will sort the list in decending order
+              Note: These methods will ht performance as we are using linked list here
+
+              4.
+              dedup is the method to remove duplicate values
+              But assert is a better way
+              (Obviously) In the above code, either use dedup or assert!
+            -}
+      -- Remove planet to the list
+
+      AddPlanets : PlanetSystemId
+        with
+          planetsToAdd : [Text]
+        do
+          create this with
+            planets = planets ++ planetsToAdd
+
+      RemovePlanet : PlanetSystemId
+        with
+          planetToRemove : Text
+        do
+          -- Check if element is available in the list or not before trying to remove it
+          assertMsg "Cannot find this Planet!" (planetToRemove `elem` planets)
+          create this with
+            planets = delete planetToRemove planets
+
+setup: Script PlanetSystemId
+
+setup = script do
+  neal <- allocateParty "Neal"
+
+  solarSystem <- submit neal do
+    createCmd PlanetSystem with
+      astronomer = neal
+      planets = ["Earth", "Mercurry", "Mars", "Jupiter", "Saturn"]
+
+  -- Uranus added to planets in 1971
+  -- Notice that the first action is performed on solarSystem contract
+  discoveredUranus <- submit neal do
+    exerciseCmd solarSystem AddPlanet with planetToAdd = "Uranus"
+    
+  -- Naptune added to planets in 1846
+  -- Notice that the next action is performed on updated contract, which is "discoveredUranus"
+  discoveredNaptune <- submit neal do
+    exerciseCmd discoveredUranus AddPlanet with planetToAdd = "Naptune"
+
+  -- Pluto added to planets in 1930
+  -- Notice that the next action is performed on updated contract, which is "discoveredNaptune"
+  discoveredPluto <- submit neal do
+    exerciseCmd discoveredNaptune AddPlanet with planetToAdd = "Pluto"
+
+  -- Removed Pluto
+  removePluto <- submit neal do
+    exerciseCmd discoveredPluto RemovePlanet with planetToRemove = "Pluto"
+
+  -- Pluto reinstated!
+  reinstatedPluto <- submit neal do
+    exerciseCmd removePluto AddPlanet with planetToAdd = "Pluto"
+
+  -- Pluto reinstated!
+  submit neal do
+    let newPlanets = ["Eris","Haumea","Ceres","Makemake"]
+    exerciseCmd reinstatedPluto AddPlanets with planetsToAdd = newPlanets
+  

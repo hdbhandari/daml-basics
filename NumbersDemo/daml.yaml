@@ -1,0 +1,13 @@
+sdk-version: 1.18.0
+name: NumbersDemo
+source: daml
+parties:
+  - Alice
+  - Bob
+version: 0.0.1
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script
+sandbox-options:
+  - --wall-clock-time

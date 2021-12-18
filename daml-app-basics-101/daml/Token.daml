@@ -1,6 +1,9 @@
--- Token module from Writing Daml Docs
+-- A Daml file defines a module
 module Token where
 
+-- with the below statement we will be able to test the script inside the IDE only
+-- We can click on 'Script Results' on top of our tests, which will open Script:setup to view the results
+-- If we wants to see the results in daml navigator, we can disable the script section and comment out the code as well
 import Daml.Script
 
 template Token
@@ -13,4 +16,8 @@ token_test : Script (ContractId Token)
 token_test = do
   alice <- allocateParty "Alice"
   submit alice do
-      createCmd Token with owner = alice
+    createCmd Token with owner = alice
+
+  elain <- allocateParty "Elain"
+  submit elain do
+    createCmd Token with owner = elain

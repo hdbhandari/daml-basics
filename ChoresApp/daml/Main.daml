@@ -1,0 +1,88 @@
+module Main where
+import Daml.Script
+
+type ChoreProposalId = ContractId ChoreProposal
+type ChoreContractId = ContractId ChoreContract
+
+-- Proposal
+template ChoreProposal
+  with
+    child : Party
+    parent : Party
+    chore : Text
+    note : Text
+  where
+    signatory child
+
+    -- What the child can do
+    controller child can
+    -- Propose
+      Propose : ChoreProposalId
+        do
+          create this
+    --Revise
+      Revise : ChoreProposalId
+        with
+          revision : Text
+          feedbackText : Text
+        do
+          create this with
+            chore = revision
+            note = feedbackText
+    -- What the parent can do
+    controller parent can
+    -- reject
+      Reject : ChoreProposalId
+        with
+          feedback : Text
+        do
+          create this with
+            note = feedback
+    -- acceps
+      Accept : ChoreContractId
+        do
+          create ChoreContract with
+            parentInContract = parent
+            childInContract = child
+            choreName = chore
+
+--Contract
+template ChoreContract 
+  with
+    parentInContract : Party
+    childInContract : Party
+    choreName : Text
+  where
+    signatory parentInContract, childInContract
+
+--tests
+setup : Script ChoreContractId
+setup = script do
+  --assign parent and child parties
+  ethan <- allocateParty "Ethan"
+  steve <- allocateParty "Steve"
+
+  -- ethan propose to take out trash for vbucks
+  ethanProposal1 <- submit ethan do
+    createCmd ChoreProposal with
+      child = ethan
+      parent = steve
+      chore = "Take out today's recycles for 5,000 vBucks"
+      note = "PLEASE!! I don't want to be default!"
+
+  -- Steve didn't like the terms, rejects it with feedback
+  steveRejectsProposal <- submit steve do
+    exerciseCmd ethanProposal1 Reject
+      with
+        feedback = "You joking right? Try all month!"
+
+  -- Ethen revise the terms, and re-process
+  ethanProposal2 <- submit ethan do
+    exerciseCmd steveRejectsProposal Revise
+      with
+        revision = "Take out the recycles 4 times this month for 3,000 vBucks"
+        feedbackText = "Fine! How about this?"
+
+  -- Steve like the new terms and accepts the revised proposal
+  submit steve do
+    exerciseCmd ethanProposal2 Accept

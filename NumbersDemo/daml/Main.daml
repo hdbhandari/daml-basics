@@ -1,0 +1,56 @@
+module Main where
+
+import Daml.Script
+import DA.Math
+
+type ComputationId = ContractId Computation
+
+template Computation
+  with
+    mathematician : Party
+    value : Int
+    addByOne : Int
+    subtractByOne : Int
+    multiplyByTwo : Int
+    divideByThree : Int
+    divideBySeven : Int
+    modulusOfFive : Int
+    powerOfTwo : Decimal  -- Numeric 10 and Required DA.Math library
+    squareRootOf : Decimal
+  where
+    signatory mathematician
+    controller mathematician can
+      Calculate: ComputationId
+        with
+          valueToTest : Int
+        do
+          create this with
+            value = valueToTest
+            addByOne = valueToTest + 1 -- Increamental operator ++ is not available in Daml
+            subtractByOne = valueToTest - 1 
+            multiplyByTwo = valueToTest * 2
+            divideByThree = valueToTest / 3
+            divideBySeven = valueToTest / 7
+            modulusOfFive = valueToTest / 5
+            powerOfTwo = (intToDecimal valueToTest) ** 2.0
+            squareRootOf = sqrt (intToDecimal valueToTest)
+
+setup: Script ComputationId
+setup = script do
+  einstein <- allocateParty "Einstein"
+
+  calculate01 <- submit einstein do
+    createCmd Computation with
+      mathematician = einstein
+      value = 0
+      addByOne = 0
+      subtractByOne = 0
+      multiplyByTwo = 0
+      divideByThree = 0
+      divideBySeven = 0
+      modulusOfFive = 0
+      powerOfTwo = 0.0
+      squareRootOf = 0.0
+
+  submit einstein do
+    exerciseCmd calculate01 Calculate with valueToTest = 12

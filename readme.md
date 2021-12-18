@@ -4,29 +4,25 @@
 - If followed in sequence it will help anyone to learn Daml
 - Comments are the key things to learn
 
-## 1. daml-web-basics-101
+## daml-app-basics-101
 
-- App based on the Getting started with Daml guide on [https://docs.daml.com/getting-started/index.html]
+## NumbersDemo
 
-## 2. daml-app-basics-101
+## SolarSystemPlanets
 
-- App based on [https://docs.daml.com/daml/intro/1_Token.html]
+## MyBorrowApp
 
-## 3. myFirstDamlApp
+## ChoresApp
 
-- App based on (I will add source later, forgot from where I have created this)
+## myFirstDamlApp
 
-## 4. MyBorrowApp
+- Created by daml command line without passing any template, which by default choose 'skeleton' as template
+- Created with command: `daml new myFirstDamlApp`
 
-- App based on the video tutorial at: [https://youtu.be/sO6F_CTeOk8?list=PLjLGVUzUMRxUqUXUGltc85HkB7CxsIYR4]
+## daml-web-basics-101
 
-### Commands
+- App based on the [Getting started](https://docs.daml.com/getting-started/index.html) with Daml guide on [Daml Docs](https://docs.daml.com/)
 
-To list all the available templates
-`daml new --list`
 
-To create a new Project based on the template
-`daml new PROJECT_NAME --template TEMPLATE_NAME`
 
-To Start Daml Navigator
-`daml start`
+
