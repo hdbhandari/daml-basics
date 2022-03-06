@@ -1,4 +1,4 @@
-module Main where
+L';'[L';['[;RQZF;Amodule Numbers where
 
 import Daml.Script
 import DA.Math
@@ -27,7 +27,7 @@ template Computation
           create this with
             value = valueToTest
             addByOne = valueToTest + 1 -- Increamental operator ++ is not available in Daml
-            subtractByOne = valueToTest - 1 
+            subtractByOne = valueToTest - 1
             multiplyByTwo = valueToTest * 2
             divideByThree = valueToTest / 3
             divideBySeven = valueToTest / 7

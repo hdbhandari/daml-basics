@@ -1,0 +1,47 @@
+module DataTypes where
+
+import Daml.Script
+
+import DA.Time
+import DA.Date
+
+template DataTypes 
+  with
+    owner : Party
+    name : Text
+    description : Text
+    age : Int
+    score : Decimal
+    isPass : Bool
+    examDate : Date
+    examTime : Time
+    -- nextExam : RelTime
+  where
+    signatory owner
+
+setup: Script()
+setup = script do
+  alice <- allocateParty("Alice")
+  bob <- allocateParty("Bob")
+
+  let
+    owner = alice
+    name = "Alice"
+
+
+  assert(alice /= bob)
+  assert(name == "Alice")
+
+  -- submit alice do
+  --   create DataTypes with
+  --     owner = alice
+  --     name = "Bob"
+  --     description = "Just an example"
+  --     age = 24
+  --     score = 99.99
+  --     isPass = True
+  --     examDate = date 2021 Feb 02
+  --     examTime = time examDate 00 00 00
+      -- nextExam = date 05 Feb 2021
+
+  return ()

@@ -1,5 +1,5 @@
 sdk-version: 1.18.0
-name: NumbersDemo
+name: DataTypes
 source: daml
 parties:
   - Alice
